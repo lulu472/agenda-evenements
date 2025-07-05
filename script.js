@@ -17,6 +17,7 @@ const db = getDatabase(app);
 const form = document.getElementById('event-form');
 const eventList = document.getElementById('event-list');
 const sortSelect = document.getElementById('sort-select');
+const toast = document.getElementById('toast');
 
 const dbRef = ref(db, 'events');
 
@@ -31,8 +32,14 @@ form.addEventListener('submit', e => {
   if (!name || !date || !city) return;
 
   push(dbRef, { name, date, city })
-    .then(() => form.reset())
-    .catch(console.error);
+    .then(() => {
+      form.reset();
+      showToast("✅ Événement ajouté !");
+    })
+    .catch(err => {
+      console.error(err);
+      showToast("❌ Erreur lors de l’ajout.");
+    });
 });
 
 onValue(dbRef, snapshot => {
@@ -47,7 +54,7 @@ function updateDisplay() {
   let sortedEvents = [...events];
   const sortValue = sortSelect.value;
 
-  switch(sortValue) {
+  switch (sortValue) {
     case 'date':
       sortedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
       break;
@@ -65,4 +72,13 @@ function updateDisplay() {
     li.innerHTML = `<span class="date">${evt.date}</span> — <span class="name">${evt.name}</span> — <span class="city">${evt.city}</span>`;
     eventList.appendChild(li);
   });
+}
+
+// 🔔 Fonction toast
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
 }
