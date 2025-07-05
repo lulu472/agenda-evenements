@@ -1,6 +1,12 @@
 const form = document.getElementById('event-form');
 const eventList = document.getElementById('event-list');
-let events = [];
+
+// Charger les événements depuis localStorage
+let events = JSON.parse(localStorage.getItem('events')) || [];
+
+// Trier et afficher les événements au démarrage
+events.sort((a, b) => new Date(a.date) - new Date(b.date));
+updateList();
 
 form.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -12,6 +18,9 @@ form.addEventListener('submit', function (e) {
 
   events.push({ name, date });
   events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // Sauvegarder dans localStorage
+  localStorage.setItem('events', JSON.stringify(events));
 
   updateList();
   form.reset();
@@ -25,3 +34,4 @@ function updateList() {
     eventList.appendChild(li);
   });
 }
+
