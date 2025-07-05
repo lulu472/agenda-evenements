@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAl_nnZWIVZii_pXVAM58YjY4njuFkBg4s",
@@ -22,6 +22,8 @@ const toast = document.getElementById('toast');
 const dbRef = ref(db, 'events');
 let events = [];
 
+let editId = null; // **Id de l'événement en cours d'édition**
+
 form.addEventListener('submit', e => {
   e.preventDefault();
 
@@ -31,15 +33,32 @@ form.addEventListener('submit', e => {
 
   if (!name || !date || !city) return;
 
-  push(dbRef, { name, date, city })
-    .then(() => {
-      form.reset();
-      showToast("✅ Événement ajouté !");
-    })
-    .catch(err => {
-      console.error(err);
-      showToast("❌ Erreur lors de l’ajout.");
-    });
+  if (editId) {
+    // === Mode édition ===
+    const updateRef = ref(db, 'events/' + editId);
+    update(updateRef, { name, date, city })
+      .then(() => {
+        showToast("✏️ Événement modifié !");
+        form.reset();
+        editId = null;
+        form.querySelector('button').textContent = "Ajouter";
+      })
+      .catch(err => {
+        console.error(err);
+        showToast("❌ Erreur lors de la modification.");
+      });
+  } else {
+    // === Mode ajout ===
+    push(dbRef, { name, date, city })
+      .then(() => {
+        form.reset();
+        showToast("✅ Événement ajouté !");
+      })
+      .catch(err => {
+        console.error(err);
+        showToast("❌ Erreur lors de l’ajout.");
+      });
+  }
 });
 
 onValue(dbRef, snapshot => {
@@ -73,11 +92,30 @@ function updateDisplay() {
       <span class="date">${evt.date}</span> —
       <span class="name">${evt.name}</span> —
       <span class="city">${evt.city}</span>
+      <button class="edit-btn" data-id="${evt.id}">✏️</button>
       <button class="delete-btn" data-id="${evt.id}">❌</button>
     `;
     eventList.appendChild(li);
   });
 
+  // Événement bouton modifier
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      const eventToEdit = events.find(e => e.id === id);
+      if (!eventToEdit) return;
+
+      // Remplir le formulaire avec les données de l'événement
+      document.getElementById('event-name').value = eventToEdit.name;
+      document.getElementById('event-date').value = eventToEdit.date;
+      document.getElementById('event-city').value = eventToEdit.city;
+
+      editId = id; // On passe en mode édition
+      form.querySelector('button').textContent = "Modifier";
+    });
+  });
+
+  // Événement bouton supprimer
   document.querySelectorAll('.delete-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.getAttribute('data-id');
