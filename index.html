@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agenda Firebase</title>
+  <title>Agenda d'Événements</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Agenda d'Événements</h1>
@@ -14,10 +15,18 @@
     <button type="submit">Ajouter</button>
   </form>
 
+  <div class="sort-options">
+    <label>Trier par :</label>
+    <select id="sort-select">
+      <option value="date-asc">Date croissante</option>
+      <option value="date-desc">Date décroissante</option>
+      <option value="name-asc">Nom A → Z</option>
+      <option value="name-desc">Nom Z → A</option>
+    </select>
+  </div>
+
   <ul id="event-list"></ul>
 
-  <!-- N'OUBLIE PAS type="module" -->
   <script type="module" src="script.js"></script>
-  <link rel="stylesheet" href="style.css" />
 </body>
 </html>
