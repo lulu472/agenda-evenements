@@ -1,54 +1,74 @@
-// ✅ Import des modules Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ✅ Configuration Firebase (corrigé : storageBucket et measurementId retiré si inutilisé ici)
+// Ta config Firebase complète avec ta vraie clé et infos
 const firebaseConfig = {
   apiKey: "AIzaSyAl_nnZWIVZii_pXVAM58YjY4njuFkBg4s",
   authDomain: "agenda-evenements-44d7d.firebaseapp.com",
   databaseURL: "https://agenda-evenements-44d7d-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "agenda-evenements-44d7d",
-  storageBucket: "agenda-evenements-44d7d.appspot.com", // ✅ corrigé ici
+  storageBucket: "agenda-evenements-44d7d.appspot.com",
   messagingSenderId: "652437255270",
   appId: "1:652437255270:web:4ed8ed8631cca5621429a7"
 };
 
-// ✅ Initialisation Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-console.log("✅ Firebase initialisé :", app.name);
 
-// ✅ Sélection des éléments HTML
 const form = document.getElementById('event-form');
 const eventList = document.getElementById('event-list');
+const sortSelect = document.getElementById('sort-select');
+
 const dbRef = ref(db, 'events');
 
-// ✅ Ajout d’un événement dans Firebase
+let events = [];
+
 form.addEventListener('submit', e => {
   e.preventDefault();
   const name = document.getElementById('event-name').value.trim();
   const date = document.getElementById('event-date').value;
 
   if (!name || !date) return;
-
   push(dbRef, { name, date })
-    .then(() => console.log("✅ Événement ajouté :", name, date))
-    .catch(err => console.error("❌ Erreur lors de l’ajout :", err));
-
-  form.reset();
+    .then(() => form.reset())
+    .catch(console.error);
 });
 
-// ✅ Récupération et affichage en temps réel
 onValue(dbRef, snapshot => {
   const data = snapshot.val() || {};
-  const events = Object.values(data).sort((a, b) => new Date(a.date) - new Date(b.date));
+  events = Object.values(data);
+  updateDisplay();
+});
+
+sortSelect.addEventListener('change', updateDisplay);
+
+function updateDisplay() {
+  let sortedEvents = [...events];
+  const sortValue = sortSelect.value;
+
+  switch(sortValue) {
+    case 'date-asc':
+      sortedEvents.sort((a,b) => new Date(a.date) - new Date(b.date));
+      break;
+    case 'date-desc':
+      sortedEvents.sort((a,b) => new Date(b.date) - new Date(a.date));
+      break;
+    case 'name-asc':
+      sortedEvents.sort((a,b) => a.name.localeCompare(b.name));
+      break;
+    case 'name-desc':
+      sortedEvents.sort((a,b) => b.name.localeCompare(a.name));
+      break;
+  }
 
   eventList.innerHTML = '';
-  events.forEach(evt => {
+  sortedEvents.forEach(evt => {
     const li = document.createElement('li');
-    li.textContent = `${evt.date} — ${evt.name}`;
+    li.innerHTML = `<span class="date">${evt.date}</span><span class="name">${evt.name}</span>`;
     eventList.appendChild(li);
   });
+}
+
 
   console.log("📥 Événements reçus :", events);
 });
