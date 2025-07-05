@@ -1,16 +1,21 @@
+/* Corps de page */
 body {
   font-family: Arial, sans-serif;
   max-width: 600px;
   margin: 30px auto;
   padding: 0 15px;
   background-color: #f9f9f9;
+  color: #333;
 }
 
+/* Titre */
 h1 {
   text-align: center;
   margin-bottom: 25px;
+  color: #2c3e50;
 }
 
+/* Formulaire */
 form {
   display: flex;
   gap: 10px;
@@ -20,18 +25,19 @@ form {
 }
 
 input[type="text"],
-input[type="date"] {
+input[type="date"],
+#search-input {
   padding: 10px;
   font-size: 16px;
   border: 1.8px solid #ccc;
   border-radius: 5px;
-  min-width: 140px;
-  transition: border-color 0.3s ease;
   background-color: white;
+  transition: border-color 0.3s ease;
 }
 
 input[type="text"]:focus,
-input[type="date"]:focus {
+input[type="date"]:focus,
+#search-input:focus {
   border-color: #2980b9;
   outline: none;
 }
@@ -51,14 +57,42 @@ button:hover {
   background-color: #1b6391;
 }
 
+/* Options de tri */
 .sort-options {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 15px;
+  align-items: center;
   gap: 10px;
-  font-size: 16px;
+  margin-bottom: 15px;
 }
 
+.sort-options label {
+  font-size: 16px;
+  color: #555;
+}
+
+.sort-options select {
+  padding: 6px 12px;
+  font-size: 15px;
+  border: 1.8px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  transition: border-color 0.3s ease;
+}
+
+.sort-options select:focus {
+  border-color: #2980b9;
+  outline: none;
+}
+
+/* Champ de recherche */
+#search-input {
+  width: 100%;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+/* Liste d’événements */
 ul#event-list {
   list-style: none;
   padding-left: 0;
@@ -66,32 +100,61 @@ ul#event-list {
 }
 
 ul#event-list li {
-  padding: 10px 12px;
-  border-bottom: 1px solid #ddd;
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background-color: white;
+  padding: 10px 12px;
   border-radius: 4px;
   margin-bottom: 8px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  font-size: 16px;
 }
 
 ul#event-list li span.date {
   font-weight: 600;
   color: #2c3e50;
+  min-width: 90px;
 }
 
 ul#event-list li span.name {
-  margin-left: 10px;
+  flex-grow: 1;
+  margin: 0 10px;
   font-weight: 600;
 }
 
 ul#event-list li span.city {
-  margin-left: 10px;
   font-style: italic;
   color: #7f8c8d;
+  min-width: 80px;
+  text-align: right;
 }
 
-/* ✅ Toast de confirmation */
+/* Boutons Edit/Delete */
+.edit-btn,
+.delete-btn {
+  margin-left: 6px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.edit-btn {
+  color: #2980b9;
+}
+
+.delete-btn {
+  color: #e74c3c;
+}
+
+.edit-btn:hover,
+.delete-btn:hover {
+  transform: scale(1.2);
+}
+
+/* Toast de confirmation */
 .toast {
   position: fixed;
   bottom: 20px;
@@ -112,32 +175,4 @@ ul#event-list li span.city {
 .toast.show {
   transform: translateX(-50%) translateY(0);
   opacity: 1;
-}
-
-.delete-btn {
-  margin-left: 10px;
-  background: transparent;
-  border: none;
-  color: #e74c3c;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.delete-btn:hover {
-  transform: scale(1.2);
-}
-
-.edit-btn {
-  margin-left: 6px;
-  background: transparent;
-  border: none;
-  color: #2980b9;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.edit-btn:hover {
-  transform: scale(1.2);
 }
