@@ -1,35 +1,80 @@
+/* style.css */
+
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f7fa;
+  margin: 0;
   padding: 20px;
-  background: #f5f5f5;
+  color: #333;
 }
 
 h1 {
   text-align: center;
+  color: #1a73e8;
+  margin-bottom: 30px;
 }
 
 form {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
 }
 
-input, button {
-  padding: 10px;
+input[type="text"],
+input[type="date"] {
+  padding: 10px 15px;
   font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+  min-width: 200px;
 }
 
-ul {
+input[type="text"]:focus,
+input[type="date"]:focus {
+  border-color: #1a73e8;
+  outline: none;
+}
+
+button {
+  padding: 10px 25px;
+  background: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  min-width: 120px;
+}
+
+button:hover {
+  background: #155ab6;
+}
+
+ul#event-list {
   list-style: none;
   padding: 0;
   max-width: 600px;
-  margin: auto;
+  margin: 0 auto;
 }
 
-li {
+ul#event-list li {
   background: white;
-  margin: 5px 0;
-  padding: 10px;
-  border-left: 5px solid #007bff;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+ul#event-list li::before {
+  content: "📅";
+  margin-right: 10px;
 }
