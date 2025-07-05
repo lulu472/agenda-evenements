@@ -1,22 +1,20 @@
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f0f2f5;
-  margin: 0;
-  padding: 20px;
-  color: #333;
+  font-family: Arial, sans-serif;
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 0 15px;
 }
 
 h1 {
   text-align: center;
-  color: #2c3e50;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 form {
   display: flex;
-  justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: center;
   margin-bottom: 20px;
 }
 
@@ -25,13 +23,8 @@ input[type="text"], input[type="date"] {
   font-size: 16px;
   border: 1.8px solid #ccc;
   border-radius: 5px;
-  min-width: 180px;
+  min-width: 140px;
   transition: border-color 0.3s ease;
-}
-
-input[type="text"]:focus, input[type="date"]:focus {
-  border-color: #2980b9;
-  outline: none;
 }
 
 button {
@@ -46,51 +39,40 @@ button {
 }
 
 button:hover {
-  background-color: #1f6391;
+  background-color: #1b6391;
 }
 
 .sort-options {
-  max-width: 600px;
-  margin: 0 auto 20px;
   display: flex;
-  align-items: center;
   justify-content: flex-end;
+  margin-bottom: 15px;
   gap: 10px;
-}
-
-#sort-select {
-  padding: 6px 12px;
-  font-size: 15px;
-  border-radius: 5px;
-  border: 1.8px solid #ccc;
-}
-
-ul#event-list {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0;
-  list-style: none;
-}
-
-ul#event-list li {
-  background: white;
-  margin-bottom: 12px;
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   font-size: 16px;
 }
 
-ul#event-list li .date {
-  font-weight: 700;
-  color: #2980b9;
+ul#event-list {
+  list-style: none;
+  padding-left: 0;
 }
 
-ul#event-list li .name {
-  margin-left: 15px;
-  flex-grow: 1;
-  text-align: left;
+ul#event-list li {
+  padding: 8px 12px;
+  border-bottom: 1px solid #ddd;
+  font-size: 16px;
+}
+
+ul#event-list li span.date {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+ul#event-list li span.name {
+  margin-left: 10px;
+  font-weight: 600;
+}
+
+ul#event-list li span.city {
+  margin-left: 10px;
+  font-style: italic;
+  color: #7f8c8d;
 }
