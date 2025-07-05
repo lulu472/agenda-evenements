@@ -10,24 +10,26 @@
   <h1>Agenda d'Événements</h1>
 
   <form id="event-form">
-  <input type="text" id="event-name" placeholder="Nom de l'événement" required />
-  <input type="date" id="event-date" required />
-  <input type="text" id="event-city" placeholder="Ville de l'événement" required />
-  <button type="submit">Ajouter</button>
-</form>
+    <input type="text" id="event-name" placeholder="Nom de l'événement" required />
+    <input type="date" id="event-date" required />
+    <input type="text" id="event-city" placeholder="Ville de l'événement" required />
+    <button type="submit">Ajouter</button>
+  </form>
   
-<div class="sort-options">
-  <label for="sort-select">Trier par :</label>
-  <select id="sort-select">
-    <option value="date">Date</option>
-    <option value="name">Nom</option>
-    <option value="city">Ville</option>
-  </select>
-</div>
+  <div class="sort-options">
+    <label for="sort-select">Trier par :</label>
+    <select id="sort-select">
+      <option value="date">Date</option>
+      <option value="name">Nom</option>
+      <option value="city">Ville</option>
+    </select>
+  </div>
 
-<ul id="event-list"></ul>
-  <div id="toast" class="toast">Événement ajouté ✅</div>
-  <div id="toast" class="toast">Message</div>
+  <ul id="event-list"></ul>
+
+  <!-- ✅ Toast unique et vide au départ -->
+  <div id="toast" class="toast"></div>
+
   <script type="module" src="script.js"></script>
 </body>
 </html>
