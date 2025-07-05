@@ -127,3 +127,17 @@ ul#event-list li span.city {
 .delete-btn:hover {
   transform: scale(1.2);
 }
+
+.edit-btn {
+  margin-left: 6px;
+  background: transparent;
+  border: none;
+  color: #2980b9;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.edit-btn:hover {
+  transform: scale(1.2);
+}
