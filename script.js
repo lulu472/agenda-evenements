@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+// 1) Ta config ici :
 const firebaseConfig = {
   apiKey: "TA_API_KEY",
   authDomain: "agenda-evenements-xxxx.firebaseapp.com",
@@ -11,43 +12,41 @@ const firebaseConfig = {
   appId: "xxxxxxx"
 };
 
+// 2) Initialisation
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+console.log("Firebase initialisé", app.name);
 
+// 3) Sélecteurs
 const form = document.getElementById('event-form');
 const eventList = document.getElementById('event-list');
+const dbRef = ref(db, 'events');
 
-// Charger les événements depuis localStorage
-let events = JSON.parse(localStorage.getItem('events')) || [];
-
-// Trier et afficher les événements au démarrage
-events.sort((a, b) => new Date(a.date) - new Date(b.date));
-updateList();
-
-form.addEventListener('submit', function (e) {
+// 4) Envoi d’un événement
+form.addEventListener('submit', e => {
   e.preventDefault();
-
   const name = document.getElementById('event-name').value.trim();
   const date = document.getElementById('event-date').value;
+  console.log("Envoi événement", name, date);
 
   if (!name || !date) return;
-
-  events.push({ name, date });
-  events.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  // Sauvegarder dans localStorage
-  localStorage.setItem('events', JSON.stringify(events));
-
-  updateList();
+  push(dbRef, { name, date })
+    .then(() => console.log("Événement ajouté"))
+    .catch(err => console.error("Erreur push :", err));
   form.reset();
 });
 
-function updateList() {
+// 5) Lecture en temps réel
+onValue(dbRef, snapshot => {
+  const data = snapshot.val() || {};
+  const events = Object.values(data).sort((a, b) => new Date(a.date) - new Date(b.date));
+  console.log("Événements reçus", events);
+
   eventList.innerHTML = '';
-  events.forEach(event => {
+  events.forEach(evt => {
     const li = document.createElement('li');
-    li.textContent = `${event.date} — ${event.name}`;
+    li.textContent = `${evt.date} — ${evt.name}`;
     eventList.appendChild(li);
   });
-}
+});
 
