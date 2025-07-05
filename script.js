@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// Configuration Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAl_nnZWIVZii_pXVAM58YjY4njuFkBg4s",
   authDomain: "agenda-evenements-44d7d.firebaseapp.com",
@@ -12,20 +11,17 @@ const firebaseConfig = {
   appId: "1:652437255270:web:4ed8ed8631cca5621429a7"
 };
 
-// Initialisation Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Sélecteurs DOM
 const form = document.getElementById('event-form');
 const eventList = document.getElementById('event-list');
 const sortSelect = document.getElementById('sort-select');
 const toast = document.getElementById('toast');
-const dbRef = ref(db, 'events');
 
+const dbRef = ref(db, 'events');
 let events = [];
 
-// 🔘 Ajouter un événement
 form.addEventListener('submit', e => {
   e.preventDefault();
 
@@ -46,19 +42,17 @@ form.addEventListener('submit', e => {
     });
 });
 
-// 🔃 Mettre à jour les événements en temps réel
 onValue(dbRef, snapshot => {
   const data = snapshot.val() || {};
-  events = Object.values(data);
+  events = Object.entries(data).map(([id, evt]) => ({ id, ...evt }));
   updateDisplay();
 });
 
-// 🔽 Trier les événements selon sélection
 sortSelect.addEventListener('change', updateDisplay);
 
 function updateDisplay() {
-  let sortedEvents = [...events];
   const sortValue = sortSelect.value;
+  let sortedEvents = [...events];
 
   switch (sortValue) {
     case 'date':
@@ -75,17 +69,30 @@ function updateDisplay() {
   eventList.innerHTML = '';
   sortedEvents.forEach(evt => {
     const li = document.createElement('li');
-    li.innerHTML = `<span class="date">${evt.date}</span> — <span class="name">${evt.name}</span> — <span class="city">${evt.city}</span>`;
+    li.innerHTML = `
+      <span class="date">${evt.date}</span> —
+      <span class="name">${evt.name}</span> —
+      <span class="city">${evt.city}</span>
+      <button class="delete-btn" data-id="${evt.id}">❌</button>
+    `;
     eventList.appendChild(li);
+  });
+
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      remove(ref(db, 'events/' + id))
+        .then(() => showToast("🗑️ Événement supprimé."))
+        .catch(err => {
+          console.error(err);
+          showToast("❌ Erreur lors de la suppression.");
+        });
+    });
   });
 }
 
-// 🔔 Afficher un message temporaire (toast)
 function showToast(message) {
-  if (!toast) return;
   toast.textContent = message;
   toast.classList.add('show');
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3000);
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
