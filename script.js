@@ -3,13 +3,14 @@ import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebas
 
 // 1) Ta config ici :
 const firebaseConfig = {
-  apiKey: "TA_API_KEY",
-  authDomain: "agenda-evenements-xxxx.firebaseapp.com",
-  databaseURL: "https://agenda-evenements-xxxx-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "agenda-evenements-xxxx",
-  storageBucket: "agenda-evenements-xxxx.appspot.com",
-  messagingSenderId: "xxxxxxx",
-  appId: "xxxxxxx"
+  apiKey: "AIzaSyDoitVR08c-uQHd9B-Tc6KpZchAphrBu9c",
+  authDomain: "agenda-evenements-44d7d.firebaseapp.com",
+  databaseURL: "https://agenda-evenements-44d7d-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "agenda-evenements-44d7d",
+  storageBucket: "agenda-evenements-44d7d.firebasestorage.app",
+  messagingSenderId: "652437255270",
+  appId: "1:652437255270:web:4ed8ed8631cca5621429a7",
+  measurementId: "G-6G72S5LH3X"
 };
 
 // 2) Initialisation
