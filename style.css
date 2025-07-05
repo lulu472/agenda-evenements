@@ -76,3 +76,25 @@ ul#event-list li span.city {
   font-style: italic;
   color: #7f8c8d;
 }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  background: #27ae60;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
