@@ -29,6 +29,7 @@ form.addEventListener('submit', e => {
   const city = document.getElementById('event-city').value.trim();
 
   if (!name || !date || !city) return;
+
   push(dbRef, { name, date, city })
     .then(() => form.reset())
     .catch(console.error);
@@ -47,17 +48,14 @@ function updateDisplay() {
   const sortValue = sortSelect.value;
 
   switch(sortValue) {
-    case 'name-asc':
-      sortedEvents.sort((a,b) => a.name.localeCompare(b.name));
+    case 'date':
+      sortedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
       break;
-    case 'name-desc':
-      sortedEvents.sort((a,b) => b.name.localeCompare(a.name));
+    case 'name':
+      sortedEvents.sort((a, b) => a.name.localeCompare(b.name));
       break;
-    case 'city-asc':
-      sortedEvents.sort((a,b) => (a.city || '').localeCompare(b.city || ''));
-      break;
-    case 'city-desc':
-      sortedEvents.sort((a,b) => (b.city || '').localeCompare(a.city || ''));
+    case 'city':
+      sortedEvents.sort((a, b) => (a.city || '').localeCompare(b.city || ''));
       break;
   }
 
