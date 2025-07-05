@@ -4,7 +4,7 @@ import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebas
 
 // ✅ Configuration Firebase (corrigé : storageBucket et measurementId retiré si inutilisé ici)
 const firebaseConfig = {
-  apiKey: "AIzaSyDoitVR08c-uQHd9B-Tc6KpZchAphrBu9c",
+  apiKey: "AIzaSyAl_nnZWIVZii_pXVAM58YjY4njuFkBg4s",
   authDomain: "agenda-evenements-44d7d.firebaseapp.com",
   databaseURL: "https://agenda-evenements-44d7d-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "agenda-evenements-44d7d",
