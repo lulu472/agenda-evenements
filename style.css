@@ -1,8 +1,6 @@
-/* style.css */
-
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f5f7fa;
+  background: #f0f2f5;
   margin: 0;
   padding: 20px;
   color: #333;
@@ -10,71 +8,89 @@ body {
 
 h1 {
   text-align: center;
-  color: #1a73e8;
-  margin-bottom: 30px;
+  color: #2c3e50;
+  margin-bottom: 20px;
 }
 
 form {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin-bottom: 30px;
+  gap: 10px;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
-input[type="text"],
-input[type="date"] {
-  padding: 10px 15px;
+input[type="text"], input[type="date"] {
+  padding: 10px;
   font-size: 16px;
-  border: 2px solid #ccc;
-  border-radius: 6px;
+  border: 1.8px solid #ccc;
+  border-radius: 5px;
+  min-width: 180px;
   transition: border-color 0.3s ease;
-  min-width: 200px;
 }
 
-input[type="text"]:focus,
-input[type="date"]:focus {
-  border-color: #1a73e8;
+input[type="text"]:focus, input[type="date"]:focus {
+  border-color: #2980b9;
   outline: none;
 }
 
 button {
-  padding: 10px 25px;
-  background: #1a73e8;
+  padding: 10px 20px;
+  background-color: #2980b9;
   color: white;
+  font-weight: 600;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 16px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background 0.3s ease;
-  min-width: 120px;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background: #155ab6;
+  background-color: #1f6391;
+}
+
+.sort-options {
+  max-width: 600px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+#sort-select {
+  padding: 6px 12px;
+  font-size: 15px;
+  border-radius: 5px;
+  border: 1.8px solid #ccc;
 }
 
 ul#event-list {
-  list-style: none;
-  padding: 0;
   max-width: 600px;
   margin: 0 auto;
+  padding: 0;
+  list-style: none;
 }
 
 ul#event-list li {
   background: white;
+  margin-bottom: 12px;
   padding: 15px 20px;
   border-radius: 8px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
-  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 16px;
 }
 
-ul#event-list li::before {
-  content: "📅";
-  margin-right: 10px;
+ul#event-list li .date {
+  font-weight: 700;
+  color: #2980b9;
+}
+
+ul#event-list li .name {
+  margin-left: 15px;
+  flex-grow: 1;
+  text-align: left;
 }
