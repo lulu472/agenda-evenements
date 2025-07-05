@@ -8,6 +8,7 @@ import {
   update
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+// ─── 1) Config Firebase ─────────────────────────────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyAl_nnZWIVZii_pXVAM58YjY4njuFkBg4s",
   authDomain: "agenda-evenements-44d7d.firebaseapp.com",
@@ -17,111 +18,108 @@ const firebaseConfig = {
   messagingSenderId: "652437255270",
   appId: "1:652437255270:web:4ed8ed8631cca5621429a7"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// ─── 2) Sélecteurs DOM ──────────────────────────────────────────────────────
 const form = document.getElementById("event-form");
 const eventList = document.getElementById("event-list");
 const sortSelect = document.getElementById("sort-select");
+const searchInput = document.getElementById("search-input");
 const toast = document.getElementById("toast");
-const searchInput = document.getElementById("search-input"); // 🔍
 
+// ─── 3) Demande de permission de notification ──────────────────────────────
+if ("Notification" in window && Notification.permission !== "granted") {
+  Notification.requestPermission().then(permission => {
+    console.log("Permission notifications :", permission);
+  });
+}
+
+// ─── 4) Référence Firebase & état ──────────────────────────────────────────
 const dbRef = ref(db, "events");
 let events = [];
 let editId = null;
 
-// Date min aujourd'hui
+// Empêcher les dates passées
 const today = new Date().toISOString().split("T")[0];
 document.getElementById("event-date").setAttribute("min", today);
 
-// Soumission du formulaire
-form.addEventListener("submit", (e) => {
+// ─── 5) Soumission du formulaire (ajout ou modification) ──────────────────
+form.addEventListener("submit", e => {
   e.preventDefault();
-
   const name = document.getElementById("event-name").value.trim();
   const date = document.getElementById("event-date").value;
   const city = document.getElementById("event-city").value.trim();
-  const submitBtn = form.querySelector("button");
-
+  const btn = form.querySelector("button");
   if (!name || !date || !city) return;
+  btn.disabled = true;
 
-  submitBtn.disabled = true;
+  const payload = { name, date, city };
+  const action = editId
+    ? update(ref(db, "events/" + editId), payload)
+    : push(dbRef, payload);
 
-  if (editId) {
-    // === MODE MODIFICATION ===
-    const updateRef = ref(db, "events/" + editId);
-    update(updateRef, { name, date, city })
-      .then(() => {
-        showToast("✏️ Événement modifié !");
-        form.reset();
+  action
+    .then(() => {
+      showToast(editId ? "✏️ Événement modifié !" : "✅ Événement ajouté !");
+      form.reset();
+      if (editId) {
         editId = null;
-        submitBtn.textContent = "Ajouter";
-      })
-      .catch(() => showToast("❌ Erreur lors de la modification."))
-      .finally(() => (submitBtn.disabled = false));
-  } else {
-    // === MODE AJOUT ===
-    push(dbRef, { name, date, city })
-      .then(() => {
-        form.reset();
-        showToast("✅ Événement ajouté !");
-      })
-      .catch(() => showToast("❌ Erreur lors de l’ajout."))
-      .finally(() => (submitBtn.disabled = false));
-  }
+        btn.textContent = "Ajouter";
+      }
+    })
+    .catch(() => {
+      showToast("❌ Une erreur est survenue.");
+    })
+    .finally(() => {
+      btn.disabled = false;
+    });
 });
 
-// Lecture en temps réel
-onValue(dbRef, (snapshot) => {
+// ─── 6) Écoute en temps réel et mise à jour ───────────────────────────────
+onValue(dbRef, snapshot => {
   const data = snapshot.val() || {};
-  events = Object.entries(data).map(([id, evt]) => ({ id, ...evt }));
+  events = Object.entries(data).map(([id, evt]) => ({ id, ...evt, notified: false }));
   updateDisplay();
 });
 
-// Recherche dynamique 🔍
+// ─── 7) Recherche & tri déclenchés ─────────────────────────────────────────
 searchInput.addEventListener("input", updateDisplay);
-
-// Tri
 sortSelect.addEventListener("change", updateDisplay);
 
-// Fonction d’affichage
+// ─── 8) Fonction d’affichage des événements ───────────────────────────────
 function updateDisplay() {
-  let sortedEvents = [...events];
+  let list = [...events];
 
-  // Tri sélectionné
-  const sortValue = sortSelect.value;
-  switch (sortValue) {
+  // Tri
+  switch (sortSelect.value) {
     case "date":
-      sortedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+      list.sort((a, b) => new Date(a.date) - new Date(b.date));
       break;
     case "name":
-      sortedEvents.sort((a, b) => a.name.localeCompare(b.name));
+      list.sort((a, b) => a.name.localeCompare(b.name));
       break;
     case "city":
-      sortedEvents.sort((a, b) => a.city.localeCompare(b.city));
+      list.sort((a, b) => a.city.localeCompare(b.city));
       break;
   }
 
-  // Recherche active
-  const query = searchInput.value.trim().toLowerCase();
-  if (query) {
-    sortedEvents = sortedEvents.filter(
-      (e) =>
-        e.name.toLowerCase().includes(query) ||
-        e.city.toLowerCase().includes(query)
+  // Filtre recherche
+  const q = searchInput.value.trim().toLowerCase();
+  if (q) {
+    list = list.filter(e =>
+      e.name.toLowerCase().includes(q) ||
+      e.city.toLowerCase().includes(q)
     );
   }
 
+  // Affichage
   eventList.innerHTML = "";
-
-  if (sortedEvents.length === 0) {
-    eventList.innerHTML =
-      '<li style="text-align:center; color:#aaa;">Aucun événement trouvé.</li>';
+  if (list.length === 0) {
+    eventList.innerHTML = '<li style="text-align:center;color:#aaa">Aucun événement trouvé.</li>';
     return;
   }
-
-  sortedEvents.forEach((evt) => {
+  list.forEach(evt => {
     const li = document.createElement("li");
     li.innerHTML = `
       <span class="date">${formatDate(evt.date)}</span> —
@@ -133,42 +131,59 @@ function updateDisplay() {
     eventList.appendChild(li);
   });
 
-  // Boutons modifier
-  document.querySelectorAll(".edit-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-id");
-      const evt = events.find((e) => e.id === id);
-      if (!evt) return;
-      document.getElementById("event-name").value = evt.name;
-      document.getElementById("event-date").value = evt.date;
-      document.getElementById("event-city").value = evt.city;
+  // Bouton modifier
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.id;
+      const e = events.find(x => x.id === id);
+      if (!e) return;
+      document.getElementById("event-name").value = e.name;
+      document.getElementById("event-date").value = e.date;
+      document.getElementById("event-city").value = e.city;
       editId = id;
       form.querySelector("button").textContent = "Modifier";
-    });
+    };
   });
 
-  // Boutons supprimer
-  document.querySelectorAll(".delete-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-id");
-      if (confirm("Confirmer la suppression ?")) {
+  // Bouton supprimer
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.id;
+      if (confirm("Confirmer la suppression ?")) {
         remove(ref(db, "events/" + id))
-          .then(() => showToast("🗑️ Événement supprimé."))
+          .then(() => showToast("🗑️ Événement supprimé !"))
           .catch(() => showToast("❌ Erreur lors de la suppression."));
       }
-    });
+    };
   });
 }
 
-// Format de date FR
-function formatDate(dateStr) {
-  const options = { year: "numeric", month: "short", day: "numeric" };
-  return new Date(dateStr).toLocaleDateString("fr-FR", options);
+// ─── 9) Notifications avant événement ─────────────────────────────────────
+setInterval(checkNotifications, 30000);
+function checkNotifications() {
+  const now = new Date();
+  const oneMinLater = new Date(now.getTime() + 60000);
+  events.forEach(evt => {
+    const eventDate = new Date(evt.date + "T00:00:00");
+    if (
+      eventDate.toDateString() === oneMinLater.toDateString() &&
+      !evt.notified &&
+      Notification.permission === "granted"
+    ) {
+      new Notification("🗓️ Rappel", {
+        body: `${evt.name} à ${evt.city} est dans 1 minute !`
+      });
+      evt.notified = true;
+    }
+  });
 }
 
-// Affiche un toast
-function showToast(message) {
-  toast.textContent = message;
+// ─── 10) Helpers ──────────────────────────────────────────────────────────
+function formatDate(d) {
+  return new Date(d).toLocaleDateString("fr-FR", { year: "numeric", month: "short", day: "numeric" });
+}
+function showToast(msg) {
+  toast.textContent = msg;
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 3000);
 }
