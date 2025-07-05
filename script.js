@@ -21,8 +21,11 @@ const toast = document.getElementById('toast');
 
 const dbRef = ref(db, 'events');
 let events = [];
+let editId = null; // ID de l'événement en cours d'édition
 
-let editId = null; // **Id de l'événement en cours d'édition**
+// Empêcher les dates passées dans le formulaire
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('event-date').setAttribute('min', today);
 
 form.addEventListener('submit', e => {
   e.preventDefault();
@@ -33,22 +36,29 @@ form.addEventListener('submit', e => {
 
   if (!name || !date || !city) return;
 
+  // Désactiver le bouton pendant traitement
+  const submitBtn = form.querySelector('button');
+  submitBtn.disabled = true;
+
   if (editId) {
-    // === Mode édition ===
+    // Mode édition
     const updateRef = ref(db, 'events/' + editId);
     update(updateRef, { name, date, city })
       .then(() => {
         showToast("✏️ Événement modifié !");
         form.reset();
         editId = null;
-        form.querySelector('button').textContent = "Ajouter";
+        submitBtn.textContent = "Ajouter";
       })
       .catch(err => {
         console.error(err);
         showToast("❌ Erreur lors de la modification.");
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
       });
   } else {
-    // === Mode ajout ===
+    // Mode ajout
     push(dbRef, { name, date, city })
       .then(() => {
         form.reset();
@@ -57,6 +67,9 @@ form.addEventListener('submit', e => {
       .catch(err => {
         console.error(err);
         showToast("❌ Erreur lors de l’ajout.");
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
       });
   }
 });
@@ -68,6 +81,11 @@ onValue(dbRef, snapshot => {
 });
 
 sortSelect.addEventListener('change', updateDisplay);
+
+function formatDate(dateStr) {
+  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  return new Date(dateStr).toLocaleDateString('fr-FR', options);
+}
 
 function updateDisplay() {
   const sortValue = sortSelect.value;
@@ -86,10 +104,16 @@ function updateDisplay() {
   }
 
   eventList.innerHTML = '';
+
+  if (sortedEvents.length === 0) {
+    eventList.innerHTML = '<li style="text-align:center; color:#999;">Aucun événement</li>';
+    return;
+  }
+
   sortedEvents.forEach(evt => {
     const li = document.createElement('li');
     li.innerHTML = `
-      <span class="date">${evt.date}</span> —
+      <span class="date">${formatDate(evt.date)}</span> —
       <span class="name">${evt.name}</span> —
       <span class="city">${evt.city}</span>
       <button class="edit-btn" data-id="${evt.id}">✏️</button>
@@ -98,33 +122,34 @@ function updateDisplay() {
     eventList.appendChild(li);
   });
 
-  // Événement bouton modifier
+  // Gestion bouton modifier
   document.querySelectorAll('.edit-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.getAttribute('data-id');
       const eventToEdit = events.find(e => e.id === id);
       if (!eventToEdit) return;
 
-      // Remplir le formulaire avec les données de l'événement
       document.getElementById('event-name').value = eventToEdit.name;
       document.getElementById('event-date').value = eventToEdit.date;
       document.getElementById('event-city').value = eventToEdit.city;
 
-      editId = id; // On passe en mode édition
+      editId = id;
       form.querySelector('button').textContent = "Modifier";
     });
   });
 
-  // Événement bouton supprimer
+  // Gestion bouton supprimer avec confirmation
   document.querySelectorAll('.delete-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.getAttribute('data-id');
-      remove(ref(db, 'events/' + id))
-        .then(() => showToast("🗑️ Événement supprimé."))
-        .catch(err => {
-          console.error(err);
-          showToast("❌ Erreur lors de la suppression.");
-        });
+      if (confirm("Confirmer la suppression de cet événement ?")) {
+        remove(ref(db, 'events/' + id))
+          .then(() => showToast("🗑️ Événement supprimé."))
+          .catch(err => {
+            console.error(err);
+            showToast("❌ Erreur lors de la suppression.");
+          });
+      }
     });
   });
 }
