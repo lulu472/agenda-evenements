@@ -1,47 +1,47 @@
+// ✅ Import des modules Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// 1) Ta config ici :
+// ✅ Configuration Firebase (corrigé : storageBucket et measurementId retiré si inutilisé ici)
 const firebaseConfig = {
   apiKey: "AIzaSyDoitVR08c-uQHd9B-Tc6KpZchAphrBu9c",
   authDomain: "agenda-evenements-44d7d.firebaseapp.com",
   databaseURL: "https://agenda-evenements-44d7d-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "agenda-evenements-44d7d",
-  storageBucket: "agenda-evenements-44d7d.firebasestorage.app",
+  storageBucket: "agenda-evenements-44d7d.appspot.com", // ✅ corrigé ici
   messagingSenderId: "652437255270",
-  appId: "1:652437255270:web:4ed8ed8631cca5621429a7",
-  measurementId: "G-6G72S5LH3X"
+  appId: "1:652437255270:web:4ed8ed8631cca5621429a7"
 };
 
-// 2) Initialisation
+// ✅ Initialisation Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-console.log("Firebase initialisé", app.name);
+console.log("✅ Firebase initialisé :", app.name);
 
-// 3) Sélecteurs
+// ✅ Sélection des éléments HTML
 const form = document.getElementById('event-form');
 const eventList = document.getElementById('event-list');
 const dbRef = ref(db, 'events');
 
-// 4) Envoi d’un événement
+// ✅ Ajout d’un événement dans Firebase
 form.addEventListener('submit', e => {
   e.preventDefault();
   const name = document.getElementById('event-name').value.trim();
   const date = document.getElementById('event-date').value;
-  console.log("Envoi événement", name, date);
 
   if (!name || !date) return;
+
   push(dbRef, { name, date })
-    .then(() => console.log("Événement ajouté"))
-    .catch(err => console.error("Erreur push :", err));
+    .then(() => console.log("✅ Événement ajouté :", name, date))
+    .catch(err => console.error("❌ Erreur lors de l’ajout :", err));
+
   form.reset();
 });
 
-// 5) Lecture en temps réel
+// ✅ Récupération et affichage en temps réel
 onValue(dbRef, snapshot => {
   const data = snapshot.val() || {};
   const events = Object.values(data).sort((a, b) => new Date(a.date) - new Date(b.date));
-  console.log("Événements reçus", events);
 
   eventList.innerHTML = '';
   events.forEach(evt => {
@@ -49,5 +49,6 @@ onValue(dbRef, snapshot => {
     li.textContent = `${evt.date} — ${evt.name}`;
     eventList.appendChild(li);
   });
-});
 
+  console.log("📥 Événements reçus :", events);
+});
