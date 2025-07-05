@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// Ta config Firebase complète avec ta vraie clé et infos
 const firebaseConfig = {
   apiKey: "AIzaSyAl_nnZWIVZii_pXVAM58YjY4njuFkBg4s",
   authDomain: "agenda-evenements-44d7d.firebaseapp.com",
@@ -27,9 +26,10 @@ form.addEventListener('submit', e => {
   e.preventDefault();
   const name = document.getElementById('event-name').value.trim();
   const date = document.getElementById('event-date').value;
+  const city = document.getElementById('event-city').value.trim();
 
-  if (!name || !date) return;
-  push(dbRef, { name, date })
+  if (!name || !date || !city) return;
+  push(dbRef, { name, date, city })
     .then(() => form.reset())
     .catch(console.error);
 });
@@ -47,28 +47,24 @@ function updateDisplay() {
   const sortValue = sortSelect.value;
 
   switch(sortValue) {
-    case 'date-asc':
-      sortedEvents.sort((a,b) => new Date(a.date) - new Date(b.date));
-      break;
-    case 'date-desc':
-      sortedEvents.sort((a,b) => new Date(b.date) - new Date(a.date));
-      break;
     case 'name-asc':
       sortedEvents.sort((a,b) => a.name.localeCompare(b.name));
       break;
     case 'name-desc':
       sortedEvents.sort((a,b) => b.name.localeCompare(a.name));
       break;
+    case 'city-asc':
+      sortedEvents.sort((a,b) => (a.city || '').localeCompare(b.city || ''));
+      break;
+    case 'city-desc':
+      sortedEvents.sort((a,b) => (b.city || '').localeCompare(a.city || ''));
+      break;
   }
 
   eventList.innerHTML = '';
   sortedEvents.forEach(evt => {
     const li = document.createElement('li');
-    li.innerHTML = `<span class="date">${evt.date}</span><span class="name">${evt.name}</span>`;
+    li.innerHTML = `<span class="date">${evt.date}</span> — <span class="name">${evt.name}</span> — <span class="city">${evt.city}</span>`;
     eventList.appendChild(li);
   });
 }
-
-
-  console.log("📥 Événements reçus :", events);
-});
