@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+// Configuration Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAl_nnZWIVZii_pXVAM58YjY4njuFkBg4s",
   authDomain: "agenda-evenements-44d7d.firebaseapp.com",
@@ -11,20 +12,23 @@ const firebaseConfig = {
   appId: "1:652437255270:web:4ed8ed8631cca5621429a7"
 };
 
+// Initialisation Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// Sélecteurs DOM
 const form = document.getElementById('event-form');
 const eventList = document.getElementById('event-list');
 const sortSelect = document.getElementById('sort-select');
 const toast = document.getElementById('toast');
-
 const dbRef = ref(db, 'events');
 
 let events = [];
 
+// 🔘 Ajouter un événement
 form.addEventListener('submit', e => {
   e.preventDefault();
+
   const name = document.getElementById('event-name').value.trim();
   const date = document.getElementById('event-date').value;
   const city = document.getElementById('event-city').value.trim();
@@ -42,12 +46,14 @@ form.addEventListener('submit', e => {
     });
 });
 
+// 🔃 Mettre à jour les événements en temps réel
 onValue(dbRef, snapshot => {
   const data = snapshot.val() || {};
   events = Object.values(data);
   updateDisplay();
 });
 
+// 🔽 Trier les événements selon sélection
 sortSelect.addEventListener('change', updateDisplay);
 
 function updateDisplay() {
@@ -74,8 +80,9 @@ function updateDisplay() {
   });
 }
 
-// 🔔 Fonction toast
+// 🔔 Afficher un message temporaire (toast)
 function showToast(message) {
+  if (!toast) return;
   toast.textContent = message;
   toast.classList.add('show');
   setTimeout(() => {
